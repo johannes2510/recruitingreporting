@@ -4,11 +4,16 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var sequelize = require('sequelize');
 
 
 var routes = require('./server/routes/index');
 var users = require('./server/routes/users');
 var hr = require('./server/routes/hr');
+var ml = require('./server/routes/ml');
+var newemp = require('./server/routes/newemp');
+var empdetail = require('./server/routes/empdetail');
+var employee = require('./server/routes/employee');
 var app = express();
 
 // view engine setup
@@ -26,7 +31,11 @@ app.use(express.static(path.join(__dirname,'./client', 'public')));
 app.use('/', routes);
 app.use('/users', users);
 app.use('/hr', hr);
-//app.use('/employee', employee);
+app.use('/ml', ml);
+app.use('/newemp', newemp);
+app.use('/empdetail', empdetail);
+app.use('/employee', employee);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

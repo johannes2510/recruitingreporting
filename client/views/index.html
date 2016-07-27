@@ -10,21 +10,19 @@
     <link href="stylesheets/style.css" rel="stylesheet" media="screen">
   </head>
   <body>
-<nav class="navbar navbar-default navbar-fixed-top">
+      <nav class="navbar navbar-default navbar-fixed-top">
           <a class="navbar-brand" href="#">
         <img alt="Ventum Consulting" src="../images/Schriftzug_ventum.png">
       </a>
   <div class="container">
     <div class="navbar-header">
         <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Recruiting <span class="sr-only">(current)</span></a></li>
-        <li><a href="/hr">HR</a></li>
+        <li class="active"><a href="/">Recruiting Reporting<span class="sr-only">(current)</span></a></li>
+        <li><a href="/hr">HR Reporting</a></li>
+        <li><a href="/ml">Mitarbeiterliste</a></li>    
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Quick Navigation <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="#">Add Employee</a></li>
-            <li><a href="#">Employee Leave</a></li>
-            <li role="separator" class="divider"></li>
             <li><a href="#">Open Tasks</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="#">Demand Management</a></li>
@@ -57,12 +55,12 @@
             <div class="col-md-3">
                     <div class="panel panel-primary">
                     <div class="topbox_cvs-heading">
-                    <h2 class="panel-title">Incoming CVs</h2>
+                    <h2 class="panel-title">Incoming CVs (YTD)</h2>
                     </div>
                     <div class="topbox_cvs" ng-controller="cvController">
                     <span style="font-size:3.5em;" class="glyphicon glyphicon-cloud-upload" aria-hidden="true" ng-bind="cvIn"></span>
-                        <hr>
-                                            <span class="glyphicon glyphicon-circle-arrow-down" aria-hidden="true"></span> 7% down since last quarter.
+                        <hr><div ng-controller="incomingLQController">
+                        Incoming LQ: <span ng-bind="LQIn"></span></div>
                     </div>
                 </div>    
 </div>
@@ -73,8 +71,9 @@
                     </div>
                     <div class="topbox_running" ng-controller="appInController">
                     <span style="font-size:3.5em;" class="glyphicon glyphicon-hourglass" aria-hidden="true" ng-bind="runCV"></span>
-                        <hr>
-                                            <span class="glyphicon glyphicon-circle-arrow-down" aria-hidden="true"></span> 5,4% - current hiring rate.
+                        <hr><div ng-controller="hiresLQController">
+                        Hiring Rate LQ: <span ng-bind="HQIn"></span>%</div>
+                    
                     </div>
                 </div>    
             </div>
@@ -85,25 +84,25 @@
                     </div>
                     <div class="topbox_hired" ng-controller="newEmpsController">
                     <span style="font-size:3.5em;" class="glyphicon glyphicon-ok-circle" aria-hidden="true" ng-bind="newEmps"></span>
-                        <hr>
-                                            <span class="glyphicon glyphicon-circle-arrow-down" aria-hidden="true"></span> 4% down YTD.
+                        <hr><div ng-controller="hiresLQAbsController">
+                        Total Hires LQ: <span ng-bind="HQAbsIn"></span></div>
                     </div>
                 </div>     
             </div>        
         </div>
 
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
              <div class="chartbox">
                     <div class="chartbox">
-                    <h4>Overall share per status</h4>  
+                    <h4>Overall share per status - All time</h4>  
                     </div>
                     <div class="panel-body" ng-controller="pieController" id="piediv" style="width: 100%; height: 100%;">
                     
                     </div>
                 </div>
           </div>  
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="chartbox">
                 <div class="chartbox"><h4>Incoming applications per month</h4></div>
                 <div class="chartbox" id="chartdiv" style="width: 100%; height: 100%;">
@@ -111,54 +110,103 @@
             </div>
 
           </div>
-        <div class="col-md-1">
-          </div>  
-        <div class="col-md-2"></div>  
-      </div> 
-        <div class="row">
-        <div class="col-md-6">
+          <div class="col-md-4">
         <div ng-controller="groupController">
-            <h4>Success rate per recruiter group</h4>
+            <h4>Success rate per recruiter group - All time</h4>
         <hr>
-        <table class="table table-hover">
+         <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Gruppe</th>
-                        <th>Einstellungen absolut</th>
-                        <th>Erfolgsquote (%)</th>
+                        <th style="text-align: center;">Einstellungen absolut</th>
+                        <th style="text-align: center;">Erfolgsquote (%)</th>
                     </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="group in groups">
-                <td> {{ group.recruiter_group }}</td>
-                <td> {{ group.sum }}</td>
+                <td> {{ group.recruitergroup_name }}</td>
+                <td style="text-align: center;"> {{ group.anzahl }}</td>
                 <td style="text-align: center;"> {{ group.round }} </td>
                 </tr>
                 </tbody>            
             </table>
         </div>
             </div>
+  
+      </div> 
+        <div class="row">
+
         
-        <div class="col-md-6">
-         <div ng-controller="recController">
-            <h4>Top 5 recruiters</h4>
+        <div class="col-md-12">
+         <div ng-controller="recruiterController">
+            <h4>Recruiters - All time</h4>
         <hr>
+         <form class="form-inline">
+        <div class="form-group">
+            <input type="text" ng-model="search" class="form-control" placeholder="Search anything">
+        </div>
+    </form>         
         <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Recruiter</th>
-                        <th>Einstellungen absolut</th>
-                        <th>Erfolgsquote (%)</th>
+                        <th ng-click="sort('recruiter_name')">Recruiter
+                        <span class="glyphicon sort-icon" ng-show="sortKey=='recruiter_name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
+                        </th>
+                        <th ng-click="sort('gesamt')"nstyle="text-align: center;">Anzahl Kandidaten 
+                        <span class="glyphicon sort-icon" ng-show="sortKey=='gesamt'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
+                        </th>
+                        <th ng-click="sort('contract_signed')" style="text-align: center;">Einstellungen
+                        <span class="glyphicon sort-icon" ng-show="sortKey=='contract_signed'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
+                        </th>                       
+                        <th ng-click="sort('running')" style="text-align: center;">Laufende Bewerbungen
+                        <span class="glyphicon sort-icon" ng-show="sortKey=='running'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
+                        </th>
+                        <th ng-click="sort('nojobaftercv')" style="text-align: center;">CV abgelehnt
+                        <span class="glyphicon sort-icon" ng-show="sortKey=='nojobaftercv'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
+                        </th>
+                        <th ng-click="sort('stepbackcv')" style="text-align: center;">Nach CV zurückgezogen
+                        <span class="glyphicon sort-icon" ng-show="sortKey=='stepbackcv'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
+                        </th>
+                        <th ng-click="sort('stepbackti')" style="text-align: center;">Nach TI zurückgezogen
+                        <span class="glyphicon sort-icon" ng-show="sortKey=='stepbackti'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
+                        </th>
+                        <th ng-click="sort('stepbackpi')" style="text-align: center;">Nach PI zurückgezogen
+                        <span class="glyphicon sort-icon" ng-show="sortKey=='stepbackpi'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
+                        </th> 
+                        <th ng-click="sort('endti')" style="text-align: center;">Nach TI beendet
+                        <span class="glyphicon sort-icon" ng-show="sortKey=='endti'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
+                        </th> 
+                        <th ng-click="sort('endpi')" style="text-align: center;">Nach PI beendet
+                        <span class="glyphicon sort-icon" ng-show="sortKey=='endpi'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
+                        </th> 
+                        <th ng-click="sort('sleep')" style="text-align: center;">Sleeping
+                        <span class="glyphicon sort-icon" ng-show="sortKey=='sleeping'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
+                        </th>  
+                        <th ng-click="sort('contract_denied')" style="text-align: center;">Vertrag abgelehnt
+                        <span class="glyphicon sort-icon" ng-show="sortKey=='contract_denied'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
+                        </th>  
+                  
                     </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="rec in recs">
-                <td> {{ rec.introduced_list }}</td>
-                <td> {{ rec.anzahl }}</td>
-                <td style="text-align: center;"> {{ rec.round }} </td>
+                <tr dir-paginate="recruiterall in recruiteralls| orderBy:'-gesamt' | orderBy:sortKey:reverse|filter:search|itemsPerPage:100">
+                <td> {{ recruiterall.recruiter_name }}</td>
+                <td style="text-align: center;"> {{ recruiterall.gesamt }}</td>
+                <td style="text-align: center;"> {{ recruiterall.contract_signed }} </td> 
+                <td style="text-align: center;"> {{ recruiterall.running }} </td>
+                <td style="text-align: center;"> {{ recruiterall.nojobaftercv }} </td>   
+                <td style="text-align: center;"> {{ recruiterall.stepbackcv }} </td>    
+                <td style="text-align: center;"> {{ recruiterall.stepbackti }} </td>    
+                <td style="text-align: center;"> {{ recruiterall.stepbackpi }} </td>  
+                <td style="text-align: center;"> {{ recruiterall.endti }} </td>   
+                <td style="text-align: center;"> {{ recruiterall.endpi }} </td>  
+                <td style="text-align: center;"> {{ recruiterall.sleep }} </td>
+                <td style="text-align: center;"> {{ recruiterall.contract_denied }} </td>                   
                 </tr>
                 </tbody>            
             </table>
+                              <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true">
+                    </dir-pagination-controls>    
         </div>    
             </div>
         </div>    
@@ -170,7 +218,7 @@
             </div>
         </div>
         </div>
-      </div>
+      
     <!-- scripts -->
             <script src="http://code.jquery.com/jquery-1.11.2.min.js" type="text/javascript"></script>
             <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js" type="text/javascript"></script>
@@ -179,6 +227,9 @@
             <script type="text/javascript">
                     google.load("visualization", "1", {packages: ["corechart"]});
             </script>
+            
             <script src="javascripts/app.js"></script>
+            <script src="javascripts/dirPagination.js"></script>
+      
   </body>
 </html>

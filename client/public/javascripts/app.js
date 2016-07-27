@@ -2,12 +2,15 @@
 
 google.load('visualization', '1', {packages:['corechart', 'orgchart']});
 
-var nodeTodo = angular.module('nodeTodo', []);
-    
+var nodeTodo = angular.module('nodeTodo', ['angularUtils.directives.dirPagination']);
+
+//angular.module('nodeTodo', ['angularUtils.directives.dirPagination']);
+
     nodeTodo.controller('mainController', ['$scope', '$http', function($scope, $http) {
 
     $scope.formData = {};
     $scope.todoData = {};
+    $scope.employeeModel = {};    
     
     // Get database input
     $http.get('/api/v1/todos')
@@ -42,8 +45,49 @@ var nodeTodo = angular.module('nodeTodo', []);
             console.log('Error: ' + error);
         })
 }]);
+
+// neuer Controller für Recruiter
+
+nodeTodo.controller('recruiterController', ['$scope', '$http', function($scope, $http){
+    $http.get('/recruiterstats')
+    .success(function(data) {
+    $scope.recruiteralls = data;
+        console.log(data);
+    })
+    $scope.sort = function(keyname){
+    $scope.sortKey = keyname;
+    $scope.reverse = !$scope.reverse;
+}
+ 
+        
+    }]);
+
+//controller für Mitarbeiterliste
+
+nodeTodo.controller('mlController', ['$scope', '$http', function($scope, $http){
+    $http.get('/employees')
+    .success(function(data) {
+    $scope.mls = data;
+    })
+    $scope.sort = function(keyname){
+    $scope.sortKey = keyname;
+    $scope.reverse = !$scope.reverse;
+}
+ 
+        
+    }]);
     
-  
+nodeTodo.controller('newEmployeeCtrl', ['$scope', '$http', '$location', function($scope, $http, $location){
+    $scope.createTodo = function(){
+            $http.post('/employees', $scope.formData).success(function(data){
+                $scope.formData = {};
+                $location.absUrl() == 'http://localhost:3000/ml';
+                alert("Der neue Mitarbeiter wurde erfolgreich gespeichert");
+        }).error(function(error) {
+            console.log('Error: ' + error);
+        });
+    };
+}]);  
 
 
 nodeTodo.controller('groupController', ['$scope', '$http', function($scope, $http){
@@ -62,7 +106,13 @@ nodeTodo.controller('recController', ['$scope', '$http', function($scope, $http)
     
     $scope.recs = data;
         })
-}]);
+    $scope.sort = function(keyname){
+    $scope.sortKey = keyname;
+    $scope.reverse = !$scope.reverse;
+} 
+}]
+              
+                   );
 
 
 nodeTodo.controller('pieController', ['$scope', '$http', function($scope, $http){
@@ -112,15 +162,14 @@ nodeTodo.controller('pieController', ['$scope', '$http', function($scope, $http)
     }]);
 
 
+
+
+
     nodeTodo.controller('genderController', ['$scope', '$http', function($scope, $http){
-        
     // Get database input
     $http.get('/api/v1/gender')
         .success(function(data) {
-    
-    $scope.genders = data;
-    $scope.quota = data[0].round * 100;    
-        //console.log(genders[0].round);
+    $scope.genders = data[0].round * 100;
 
          })
     
@@ -187,20 +236,95 @@ nodeTodo.controller('counselingController', ['$scope', '$http', function($scope,
         .success(function(data) {
             $scope.counselors = data;
         })
+        $scope.sort = function(keyname){
+        $scope.sortKey = keyname;
+        $scope.reverse = !$scope.reverse;
+}
+        $scope.getCounselor = function (emp_name) {
+            var selectedCounselor = $scope.ddlCounselor;
+            console.log(selectedCounselor);
+        }
+        
+        
+        
 
 }]);
 
-nodeTodo.controller('fullListController', ['$scope', '$http', function($scope, $http){
+nodeTodo.controller('fullListController', ['$scope', '$http', function($scope, $http, recVellow){
 
-    // Get database input
-    $http.get('/api/v1/fullList')
+         nodeTodo.service('recVellow', function(selectedVellow){
+            var _vellow = selectedVellow;
+            this.getSelectedVellow = function(){
+                return _vellow;
+            }
+            
+        }); 
+    
+        $http.get('/api/v1/fullList')
         .success(function(data) {
             $scope.fulllists = data;
         })
+        $scope.sort = function(keyname){
+        $scope.sortKey = keyname;
+        $scope.reverse = !$scope.reverse;
+}
+        
+        $scope.clickRow = function($index, fulllist) {
+        $scope.selectedRow = this.fulllist;
+        console.log($scope.selectedRow);
+};
+        $scope.isActive = function(fulllist) {
+            if(fulllist.emp_status == 'active') {
+                return true;
+            }
+            return false;
+        };
+
+            $scope.getVellow = function(emp_name){
+            var selectedVellow = $scope.employeeModel.emp_vellow;
+            //recVellow.getSelectedVellow(selectedVellow);    
+};
+
+            
+
+        $scope.onSubmit = function(empID) {
+        var emp_id = empID;    
+        console.log($scope.employeeModel);    
+        $http.put('/api/v1/fullList/'+emp_id, $scope.employeeModel).success(function(data) {
+            console.log("success");
+        }).error(function(data) {
+            console.log(data);
+        });    
+    };
+}]);
+
+nodeTodo.controller('incomingLQController', ['$scope', '$http', function($scope, $http){
+
+    // Get database input
+    $http.get('/api/v1/lqincoming')
+        .success(function(data) {
+             $scope.LQIn = data[0].sum;  
+        })
 
 }]);
-        
-        
+
+nodeTodo.controller('hiresLQController', ['$scope', '$http', function($scope, $http){
+
+    // Get database input
+    $http.get('/api/v1/hiresLQ')
+        .success(function(data) {
+             $scope.HQIn = data[0].gesamt;  
+        })
+}]);   
+
+nodeTodo.controller('hiresLQAbsController', ['$scope', '$http', function($scope, $http){
+
+    // Get database input
+    $http.get('/api/v1/hiresAbsLQ')
+        .success(function(data) {
+             $scope.HQAbsIn = data[0].gesamt;  
+        })
+}]);   
  
 
 

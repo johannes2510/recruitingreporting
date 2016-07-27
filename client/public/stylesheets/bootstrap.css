@@ -2756,7 +2756,7 @@ select[multiple].input-lg {
 }
 .form-group-lg .form-control {
   height: 46px;
-  padding: 10px 16px;
+  padding: 0px 0px;
   font-size: 18px;
   line-height: 1.3333333;
   border-radius: 6px;
@@ -5966,7 +5966,7 @@ button.close {
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 1040;
+  z-index: 0;
   background-color: #000;
 }
 .modal-backdrop.fade {

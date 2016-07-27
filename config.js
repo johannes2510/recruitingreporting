@@ -1,2 +1,2 @@
-var connectionString = process.env.DATABASE_URL || 'postgres://postgres:ert45dfg@localhost:5432/HR';
+var connectionString = process.env.DATABASE_URL || 'postgres://bzwzunstdcfhea:x4U1QyGwg7bV-eDVlkqoCGGTEk@ec2-54-217-243-228.eu-west-1.compute.amazonaws.com:5432/d1klf04kit835k';
 module.exports = connectionString;
